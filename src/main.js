@@ -1,6 +1,10 @@
 import "./css/index.css"
 import IMask from "imask";
 
+const formCard = document.querySelector('form').addEventListener('submit', () => {
+  event.preventDefault();
+})
+
 const ccBgColor01 = document.querySelector('.cc-bg svg > g g:nth-child(1) path');
 const ccBgColor02 = document.querySelector('.cc-bg svg > g g:nth-child(2) path');
 
@@ -19,12 +23,10 @@ function setCardType(type) {
   ccBgColor02.setAttribute('fill', colors[type][1]);
   ccLogo.setAttribute('src', `cc-${type}.svg`)
 }
+globalThis.setCardType = setCardType // Tornando a função global, assumindo o escopo global
 
 
-globalThis.setCardType = setCardType
-
-
-// Security Code Mask - CVC
+// --------------------------  Security Code Mask - CVC
 const securityCode = document.getElementById('security-code');
 const securityCodePattern = {
   mask: '000'
@@ -33,7 +35,7 @@ const securityCodePattern = {
 const securityCodeMasked = IMask(securityCode, securityCodePattern)
 
 
-// Expiration Date
+// ---------------------------  Expiration Date
 const expirationDate = document.querySelector('#expiration-date');
 const expirationDatePattern = {
   mask: 'MM{/}YY',
@@ -50,14 +52,46 @@ const expirationDatePattern = {
     }
   }
 }
-
 const expirationDateMasked = IMask(expirationDate, expirationDatePattern);
 
-
-// Card Number Mask
+// ----------------------- Card Number Mask
 const cardNumber = document.querySelector('#card-number');
+// Estrutura de dados do objeto para o dynamicMasked. Usando essa estrutura ele pode navegar deixando dinâmico 
 const cardNumberPattern = {
-  mask: '0000 0000 0000 0000'
+  mask: [
+    {
+      mask: "0000 0000 0000 0000",
+      regex: /^4\d{0,15}/,
+      cardType: "visa"
+    },
+    {
+      mask: "0000 0000 0000 0000",
+      regex: /(^5[1-5]\d{0,2}|^22[2-9]\d|^2[3-7]\d{0,2})\d{0,12}/,
+      cardType: "mastercard",
+    },
+    {
+      mask: '0000 0000 0000 0000',
+      cardType: "default"
+    }
+  ],
+  dispatch: function (appended, dynamicMasked) { // Propriedade dispatch que vai executar a função todas as vezes que um número é digitado. A função vai ler o valor, concatenar com o appended e substituir com o replace. Se for um não dígito(valores numéricos), retorna vazio
+    const number = (dynamicMasked.value + appended).replace(/\D/g, ""); 
+    
+    /* O item é o objeto do array, na arrow function, para pegar só um valor do item, faz-se uma desestruturação com o ({valor}) => {}; 
+    const foundMask = dynamicMasked.compiledMasks.find(({regex}) => number.match(regex)); */
+    
+    const foundMask = dynamicMasked.compiledMasks.find(function (item) { // Se retornar true, ele insere o valor no foundmask, se for false, ele não insere.
+      return number.match(item.regex) // Pegou o number, roda o match, se encontrar, é true, senão é false
+    });
+    console.log(foundMask);
+    return foundMask; // A função dispatch precisa retornar o foundMask (toda a regra colocada na função) para obter o valor encontrado, senão sempre irá retornar o default
+  },
 }
-
 const cardNumberMasked = IMask(cardNumber, cardNumberPattern);
+
+const addButton = document.querySelector("#add-card");
+
+addButton.addEventListener('click', () => {
+  console.log('Olá!')
+
+})
