@@ -34,7 +34,6 @@ const securityCodePattern = {
 
 const securityCodeMasked = IMask(securityCode, securityCodePattern)
 
-
 // ---------------------------  Expiration Date
 const expirationDate = document.querySelector('#expiration-date');
 const expirationDatePattern = {
@@ -56,6 +55,7 @@ const expirationDateMasked = IMask(expirationDate, expirationDatePattern);
 
 // ----------------------- Card Number Mask
 const cardNumber = document.querySelector('#card-number');
+
 // Estrutura de dados do objeto para o dynamicMasked. Usando essa estrutura ele pode navegar deixando dinâmico 
 const cardNumberPattern = {
   mask: [
@@ -81,8 +81,12 @@ const cardNumberPattern = {
     const foundMask = dynamicMasked.compiledMasks.find(({regex}) => number.match(regex)); */
     
     const foundMask = dynamicMasked.compiledMasks.find(function (item) { // Se retornar true, ele insere o valor no foundmask, se for false, ele não insere.
+    // const ccNumber = document.querySelector('#cc-number');
+    // ccNumber.innerText = cardNumber.value;
       return number.match(item.regex) // Pegou o number, roda o match, se encontrar, é true, senão é false
+      
     });
+    
     console.log(foundMask);
     return foundMask; // A função dispatch precisa retornar o foundMask (toda a regra colocada na função) para obter o valor encontrado, senão sempre irá retornar o default
   },
@@ -92,6 +96,39 @@ const cardNumberMasked = IMask(cardNumber, cardNumberPattern);
 const addButton = document.querySelector("#add-card");
 
 addButton.addEventListener('click', () => {
-  console.log('Olá!')
-
+  alert('Cartão Adicionado com sucesso!');
 })
+
+const cardHolder = document.querySelector('#card-holder');
+cardHolder.addEventListener('input', (event) => {
+  const ccHolder = document.querySelector('.cc-holder .value');
+  ccHolder.innerText = cardHolder.value.length === 0 ? "FULANO DA SILVA" : cardHolder.value;
+})
+
+// Trabalhando com o IMASK
+securityCodeMasked.on('accept', () => {
+  updateSecurityCode(securityCodeMasked.value)
+}); // O ON, Funciona como o addEventListener e o accept é se ele passou nas regras
+
+function updateSecurityCode (code) {
+  const ccSecurity = document.querySelector('.cc-security .value');
+  ccSecurity.innerText = code.length === 0 ? "123" : code ;
+}
+
+expirationDateMasked.on('accept', () => {
+  updateExpirationDate(expirationDateMasked.value);
+})
+
+function updateExpirationDate(expirationDate) {
+  const ccExpirationDate = document.querySelector('.cc-expiration-date.value');
+  ccExpirationDate.innerText = expirationDate === 0 ? '02/32' : expirationDate
+}
+
+cardNumberMasked.on('accept', () => {
+  updateCardNumber(cardNumberMasked.value);
+});
+
+function updateCardNumber (currentCardNumber) {
+  const ccNumber = document.querySelector('#cc-number');
+  ccNumber.innerText = currentCardNumber.length === 0 ? '1234 5678 9012 3456': currentCardNumber
+}
