@@ -112,7 +112,7 @@ securityCodeMasked.on('accept', () => {
 
 function updateSecurityCode (code) {
   const ccSecurity = document.querySelector('.cc-security .value');
-  ccSecurity.innerText = code.length === 0 ? "123" : code ;
+  ccSecurity.innerText = code.length === 0 ? "123" : code;
 }
 
 expirationDateMasked.on('accept', () => {
@@ -120,15 +120,19 @@ expirationDateMasked.on('accept', () => {
 })
 
 function updateExpirationDate(expirationDate) {
-  const ccExpirationDate = document.querySelector('.cc-expiration-date.value');
-  ccExpirationDate.innerText = expirationDate === 0 ? '02/32' : expirationDate
+  const ccExpirationDate = document.querySelector('.cc-expiration .value');
+  ccExpirationDate.innerText = expirationDate.length === 0 ? '02/32' : expirationDate
 }
 
+
+// Bloco executando 2 ações - adicionando o conteúdo para apresentação no cartão e alterando a bandeira com suas cores e ícones
 cardNumberMasked.on('accept', () => {
-  updateCardNumber(cardNumberMasked.value);
+  const cardType = cardNumberMasked.masked.currentMask.cardType; // Acessando o conteúdo através dos métodos
+  setCardType(cardType); // Executando a função que define o tipo do cartão
+  updateCardNumber(cardNumberMasked.value); 
 });
 
 function updateCardNumber (currentCardNumber) {
   const ccNumber = document.querySelector('#cc-number');
-  ccNumber.innerText = currentCardNumber.length === 0 ? '1234 5678 9012 3456': currentCardNumber
+  ccNumber.innerText = currentCardNumber.length === 0 ? '1234 5678 9012 3456' : currentCardNumber;
 }
